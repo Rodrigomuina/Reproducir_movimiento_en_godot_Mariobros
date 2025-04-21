@@ -1,13 +1,41 @@
-[gd_scene load_steps=7 format=3 uid="uid://c3kmbiqc248tc"]
+[gd_scene load_steps=8 format=3 uid="uid://c3kmbiqc248tc"]
 
 [ext_resource type="Texture2D" uid="uid://drnuj5vwmxf40" path="res://mario/marioparadoder.png" id="1_r4vob"]
 [ext_resource type="Texture2D" uid="uid://cyukw13rv36so" path="res://mario/mariosaltandoder.png" id="2_rs0fl"]
 [ext_resource type="Texture2D" uid="uid://c4e7n4os770ds" path="res://mario/mariocaminando1der.png" id="3_rwhqh"]
 [ext_resource type="Texture2D" uid="uid://debmq0sstyh6v" path="res://mario/mariocorre.png" id="4_1sgla"]
 
+[sub_resource type="GDScript" id="GDScript_r4vob"]
+script/source = "extends CharacterBody2D
+
+
+const SPEED = 300.0
+const JUMP_VELOCITY = -400.0
+
+
+func _physics_process(delta: float) -> void:
+	# Add the gravity.
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+
+	# Handle jump.
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var direction := Input.get_axis(\"ui_left\", \"ui_right\")
+	if direction:
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+
+	move_and_slide()
+"
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xvk78"]
 radius = 5.0
-height = 12.0
+height = 14.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_by8u1"]
 animations = [{
@@ -40,6 +68,7 @@ animations = [{
 }]
 
 [node name="CharacterBody2D" type="CharacterBody2D"]
+script = SubResource("GDScript_r4vob")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_xvk78")
@@ -50,4 +79,7 @@ position = Vector2(-1, 0)
 scale = Vector2(0.412162, 0.416667)
 sprite_frames = SubResource("SpriteFrames_by8u1")
 animation = &"Idle"
-frame_progress = 0.645633
+frame_progress = 0.324877
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(5, 5)
